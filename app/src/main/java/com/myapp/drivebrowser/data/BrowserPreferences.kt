@@ -25,6 +25,13 @@ object BrowserPreferences {
     private const val KEY_GLOBAL_SCALE = "global_scale_percent"
     private const val KEY_RESUME_LAST_PAGE = "resume_last_page"
     private const val KEY_LAST_PAGE = "last_page_url"
+    private const val KEY_FAB_ENABLED = "fab_enabled"
+    private const val KEY_FAB_MODE = "fab_mode"
+    private const val KEY_FAB_POSITION = "fab_position"
+    private const val KEY_QUICK_LINKS = "quick_links"
+    private const val KEY_START_BACKGROUND = "start_background_uri"
+
+    const val QUICK_LINK_SLOTS = 6
     private const val KEY_BOOKMARKS = "bookmarks"
     private const val KEY_TAB_SESSION = "tab_session"
     private const val KEY_ALLOWED_CLEAR_HOSTS = "allowed_cleartext_hosts"
@@ -94,6 +101,65 @@ object BrowserPreferences {
         prefs(context).getString(KEY_LAST_PAGE, null)?.takeIf { it.isNotBlank() }
     fun setLastPageUrl(context: Context, url: String?) =
         prefs(context).edit().putString(KEY_LAST_PAGE, url?.takeIf { it.isNotBlank() }.orEmpty()).apply()
+
+    // ---- Floating quick-action button ----
+
+    fun isFabEnabled(context: Context) = prefs(context).getBoolean(KEY_FAB_ENABLED, true)
+    fun setFabEnabled(context: Context, v: Boolean) =
+        prefs(context).edit().putBoolean(KEY_FAB_ENABLED, v).apply()
+
+    fun getFabMode(context: Context) =
+        com.myapp.drivebrowser.model.QuickActionButtonMode.fromKey(prefs(context).getString(KEY_FAB_MODE, null))
+    fun setFabMode(context: Context, mode: com.myapp.drivebrowser.model.QuickActionButtonMode) =
+        prefs(context).edit().putString(KEY_FAB_MODE, mode.storageKey).apply()
+
+    fun getFabPosition(context: Context) =
+        com.myapp.drivebrowser.model.QuickActionButtonPosition.fromKey(prefs(context).getString(KEY_FAB_POSITION, null))
+    fun setFabPosition(context: Context, position: com.myapp.drivebrowser.model.QuickActionButtonPosition) =
+        prefs(context).edit().putString(KEY_FAB_POSITION, position.storageKey).apply()
+
+    // ---- Start-page quick links (exactly QUICK_LINK_SLOTS, empty url = empty slot) ----
+
+    fun getQuickLinks(context: Context): List<Bookmark> {
+        val raw = prefs(context).getString(KEY_QUICK_LINKS, null)
+        val parsed = raw?.let {
+            runCatching {
+                val arr = JSONArray(it)
+                buildList {
+                    for (i in 0 until arr.length()) {
+                        val o = arr.optJSONObject(i)
+                        add(Bookmark(o?.optString("title").orEmpty(), o?.optString("url").orEmpty()))
+                    }
+                }
+            }.getOrNull()
+        } ?: defaultQuickLinks()
+        return (parsed + List(QUICK_LINK_SLOTS) { Bookmark("", "") }).take(QUICK_LINK_SLOTS)
+    }
+
+    fun setQuickLink(context: Context, index: Int, title: String, url: String) {
+        if (index !in 0 until QUICK_LINK_SLOTS) return
+        val list = getQuickLinks(context).toMutableList()
+        list[index] = Bookmark(title.trim(), url.trim())
+        val arr = JSONArray()
+        list.forEach { arr.put(JSONObject().apply { put("title", it.title); put("url", it.url) }) }
+        prefs(context).edit().putString(KEY_QUICK_LINKS, arr.toString()).apply()
+    }
+
+    private fun defaultQuickLinks() = listOf(
+        Bookmark("Google", "https://www.google.com/"),
+        Bookmark("YouTube", "https://m.youtube.com/"),
+        Bookmark("Maps", "https://maps.google.com/"),
+        Bookmark("Wikipedia", "https://www.wikipedia.org/"),
+        Bookmark("News", "https://news.google.com/"),
+        Bookmark("Weather", "https://weather.com/")
+    )
+
+    // ---- Start-page background ----
+
+    fun getStartBackgroundUri(context: Context): String? =
+        prefs(context).getString(KEY_START_BACKGROUND, null)?.takeIf { it.isNotBlank() }
+    fun setStartBackgroundUri(context: Context, uri: String?) =
+        prefs(context).edit().putString(KEY_START_BACKGROUND, uri?.takeIf { it.isNotBlank() }.orEmpty()).apply()
 
     // ---- URL helpers ----
 

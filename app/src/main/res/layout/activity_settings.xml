@@ -107,11 +107,80 @@
             android:layout_marginTop="8dp"
             android:text="@string/settings_clear_data" />
 
+        <!-- Floating quick button -->
+        <TextView style="@style/SettingsHeader" android:text="@string/settings_fab" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchFab"
+            style="@style/SettingsSwitch"
+            android:text="@string/settings_fab_enabled" />
+
+        <TextView style="@style/SettingsSwitch" android:text="@string/settings_fab_mode" />
+
+        <RadioGroup
+            android:id="@+id/fabModeGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <RadioButton android:id="@+id/fabModeMenu" style="@style/SettingsRadio" android:text="@string/settings_fab_mode_menu" />
+            <RadioButton android:id="@+id/fabModeUrl" style="@style/SettingsRadio" android:text="@string/settings_fab_mode_url" />
+        </RadioGroup>
+
+        <TextView style="@style/SettingsSwitch" android:text="@string/settings_fab_position" />
+
+        <RadioGroup
+            android:id="@+id/fabPositionGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <RadioButton android:id="@+id/fabPosTopStart" style="@style/SettingsRadio" android:text="@string/settings_fab_pos_top_start" />
+            <RadioButton android:id="@+id/fabPosTopEnd" style="@style/SettingsRadio" android:text="@string/settings_fab_pos_top_end" />
+            <RadioButton android:id="@+id/fabPosBottomStart" style="@style/SettingsRadio" android:text="@string/settings_fab_pos_bottom_start" />
+            <RadioButton android:id="@+id/fabPosBottomEnd" style="@style/SettingsRadio" android:text="@string/settings_fab_pos_bottom_end" />
+        </RadioGroup>
+
+        <!-- Start page background -->
+        <TextView style="@style/SettingsHeader" android:text="@string/settings_start_background" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPickBackground"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/settings_pick_background" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnClearBackground"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/settings_clear_background" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSaveSettings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="@string/settings_save" />
+
+        <!-- About -->
+        <TextView style="@style/SettingsHeader" android:text="@string/settings_about" />
+
+        <TextView
+            android:id="@+id/labelVersion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="14sp"
+            android:text="@string/settings_version" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCheckUpdate"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/settings_check_update" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

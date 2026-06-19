@@ -77,6 +77,43 @@
     <string name="settings_save">Save</string>
     <string name="settings_cleared">Cleared</string>
 
+    <string name="settings_about">About</string>
+    <string name="settings_version">Version %1$s</string>
+    <string name="settings_check_update">Check for updates</string>
+    <string name="update_checking">Checking for updates…</string>
+    <string name="update_available_title">Update available</string>
+    <string name="update_available_message">A new version (v%1$s) is available. You have v%2$s.</string>
+    <string name="update_download">Download</string>
+    <string name="update_up_to_date">You\'re on the latest version (v%1$s).</string>
+    <string name="update_failed">Couldn\'t check for updates: %1$s</string>
+    <string name="update_later">Later</string>
+
     <string name="start_page_title">DriveBrowser</string>
     <string name="error_page_title">Can\'t reach this site</string>
+
+    <!-- Quick links -->
+    <string name="add_quick_link">Add</string>
+    <string name="edit_quick_link">Edit quick link</string>
+    <string name="quick_link_label_hint">Label</string>
+    <string name="quick_link_url_hint">URL</string>
+    <string name="remove">Remove</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Quick-action button settings -->
+    <string name="settings_fab">Floating quick button</string>
+    <string name="settings_fab_enabled">Show floating button</string>
+    <string name="settings_fab_mode">Button opens</string>
+    <string name="settings_fab_mode_menu">Menu</string>
+    <string name="settings_fab_mode_url">Address bar</string>
+    <string name="settings_fab_position">Button position</string>
+    <string name="settings_fab_pos_top_start">Top left</string>
+    <string name="settings_fab_pos_top_end">Top right</string>
+    <string name="settings_fab_pos_bottom_start">Bottom left</string>
+    <string name="settings_fab_pos_bottom_end">Bottom right</string>
+
+    <!-- Start-page background -->
+    <string name="settings_start_background">Start page background</string>
+    <string name="settings_pick_background">Choose image</string>
+    <string name="settings_clear_background">Clear image</string>
 </resources>

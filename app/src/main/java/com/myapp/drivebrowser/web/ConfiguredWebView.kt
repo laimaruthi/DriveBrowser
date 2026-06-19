@@ -19,6 +19,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.core.net.toUri
+import androidx.webkit.UserAgentMetadata
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import com.myapp.drivebrowser.R
@@ -140,6 +141,12 @@ fun configureWebView(
                 } else {
                     handler.cancel()
                 }
+            }
+
+            override fun onReceivedClientCertRequest(view: WebView, request: android.webkit.ClientCertRequest) {
+                val activity = view.context as? android.app.Activity
+                if (activity != null) ClientCertHandler.handleClientCertRequest(activity, request)
+                else request.cancel()
             }
         }
 
@@ -274,6 +281,38 @@ private fun WebView.applyBrowserIdentity(profile: UserAgentProfile, desktop: Boo
     if (desktop) setInitialScale(0)
     else setInitialScale((context.resources.displayMetrics.density * 100).toInt())
     settings.textZoom = BrowserPreferences.getGlobalScalePercent(context)
+    applyUserAgentMetadata(profile, desktop)
+}
+
+/** Sets matching User-Agent Client Hints so sites that read UA-CH see a consistent identity. */
+private fun WebView.applyUserAgentMetadata(profile: UserAgentProfile, desktop: Boolean) {
+    if (!WebViewFeature.isFeatureSupported(WebViewFeature.USER_AGENT_METADATA)) return
+    val builder = UserAgentMetadata.Builder()
+        .setMobile(!desktop)
+        .setModel("")
+    when (profile) {
+        UserAgentProfile.ANDROID_CHROME -> {
+            val major = CHROME_VERSION.substringBefore('.')
+            builder.setBrandVersionList(
+                listOf(
+                    UserAgentMetadata.BrandVersion.Builder()
+                        .setBrand("Chromium").setMajorVersion(major).setFullVersion(CHROME_VERSION).build(),
+                    UserAgentMetadata.BrandVersion.Builder()
+                        .setBrand("Google Chrome").setMajorVersion(major).setFullVersion(CHROME_VERSION).build()
+                )
+            )
+            builder.setFullVersion(CHROME_VERSION)
+                .setPlatform(if (desktop) "Windows" else "Android")
+                .setPlatformVersion(if (desktop) "10.0.0" else "10.0.0")
+                .setArchitecture(if (desktop) "x86" else "")
+        }
+        UserAgentProfile.SAFARI -> {
+            builder.setPlatform(if (desktop) "macOS" else "iOS")
+                .setPlatformVersion(if (desktop) "14.0.0" else "17.0.0")
+                .setArchitecture(if (desktop) "arm" else "")
+        }
+    }
+    runCatching { WebSettingsCompat.setUserAgentMetadata(settings, builder.build()) }
 }
 
 private fun WebView.applyPageDarkening(enabled: Boolean) {

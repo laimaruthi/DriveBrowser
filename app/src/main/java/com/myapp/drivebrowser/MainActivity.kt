@@ -97,12 +97,25 @@ class MainActivity : AppCompatActivity() {
 
         tabManager.restoreSessionOrHome()
         refreshStartPage()
+        setupFab()
+        applyStartBackground()
         updateContentVisibility()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             !PermissionManager.hasNotifications(this)
         ) {
             notificationLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+
+        // Quietly check for a newer release; notify only if one is available.
+        com.myapp.drivebrowser.update.UpdateChecker.check(com.myapp.drivebrowser.BuildConfig.VERSION_NAME) { r ->
+            if (r.updateAvailable) {
+                android.widget.Toast.makeText(
+                    this,
+                    getString(R.string.update_available_title) + ": v" + r.latestVersion,
+                    android.widget.Toast.LENGTH_LONG
+                ).show()
+            }
         }
     }
 
@@ -147,7 +160,10 @@ class MainActivity : AppCompatActivity() {
             onOpen = { url -> loadUrl(url); hidePanel() },
             onDelete = { url -> BrowserPreferences.removeBookmark(this, url); bookmarkAdapter.submit(BrowserPreferences.getBookmarks(this)); refreshStartPage() }
         )
-        startPageAdapter = StartPageAdapter(onOpen = { url -> loadUrl(url) })
+        startPageAdapter = StartPageAdapter(
+            onOpen = { url -> loadUrl(url) },
+            onEdit = { index -> editQuickLink(index) }
+        )
         binding.startPageRecycler.layoutManager = GridLayoutManager(this, 3)
         binding.startPageRecycler.adapter = startPageAdapter
     }
@@ -239,17 +255,93 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun refreshStartPage() {
-        val defaults = listOf(
-            StartPageAdapter.Slot("Google", "https://www.google.com/"),
-            StartPageAdapter.Slot("YouTube", "https://m.youtube.com/"),
-            StartPageAdapter.Slot("Maps", "https://maps.google.com/"),
-            StartPageAdapter.Slot("Wikipedia", "https://www.wikipedia.org/")
-        )
-        val bookmarks = BrowserPreferences.getBookmarks(this)
+        val slots = BrowserPreferences.getQuickLinks(this)
             .map { StartPageAdapter.Slot(it.title, it.url) }
-        val seen = HashSet<String>()
-        val combined = (defaults + bookmarks).filter { seen.add(it.url) }
-        startPageAdapter.submit(combined)
+        startPageAdapter.submit(slots)
+    }
+
+    private fun editQuickLink(index: Int) {
+        val current = BrowserPreferences.getQuickLinks(this).getOrNull(index)
+        val container = android.widget.LinearLayout(this).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            val pad = (20 * resources.displayMetrics.density).toInt()
+            setPadding(pad, pad / 2, pad, 0)
+        }
+        val labelInput = android.widget.EditText(this).apply {
+            hint = getString(R.string.quick_link_label_hint)
+            setText(current?.title.orEmpty())
+            setSingleLine()
+        }
+        val urlInput = android.widget.EditText(this).apply {
+            hint = getString(R.string.quick_link_url_hint)
+            setText(current?.url.orEmpty())
+            inputType = android.text.InputType.TYPE_TEXT_VARIATION_URI
+            setSingleLine()
+        }
+        container.addView(labelInput)
+        container.addView(urlInput)
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.edit_quick_link)
+            .setView(container)
+            .setNeutralButton(R.string.remove) { _, _ ->
+                BrowserPreferences.setQuickLink(this, index, "", ""); refreshStartPage()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .setPositiveButton(R.string.save) { _, _ ->
+                val rawUrl = urlInput.text?.toString().orEmpty().trim()
+                val url = if (rawUrl.isBlank()) "" else BrowserPreferences.normalizeToUrlOrSearch(rawUrl)
+                BrowserPreferences.setQuickLink(this, index, labelInput.text?.toString().orEmpty(), url)
+                refreshStartPage()
+            }
+            .show()
+    }
+
+    private fun setupFab() {
+        val fab = binding.fabQuickAction
+        if (!BrowserPreferences.isFabEnabled(this)) {
+            fab.visibility = View.GONE
+            return
+        }
+        fab.visibility = View.VISIBLE
+        (fab.layoutParams as? FrameLayout.LayoutParams)?.let {
+            it.gravity = BrowserPreferences.getFabPosition(this).gravity
+            fab.layoutParams = it
+        }
+        val mode = BrowserPreferences.getFabMode(this)
+        fab.setImageResource(
+            if (mode == com.myapp.drivebrowser.model.QuickActionButtonMode.URL_BAR) R.drawable.ic_search else R.drawable.ic_menu
+        )
+        fab.setOnClickListener {
+            if (mode == com.myapp.drivebrowser.model.QuickActionButtonMode.URL_BAR) {
+                binding.addressEdit.requestFocus()
+                showKeyboard()
+            } else {
+                showMenuPanel()
+            }
+        }
+    }
+
+    private fun showKeyboard() {
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+        binding.addressEdit.post { imm.showSoftInput(binding.addressEdit, 0) }
+    }
+
+    private fun applyStartBackground() {
+        val uriStr = BrowserPreferences.getStartBackgroundUri(this)
+        if (uriStr == null) {
+            binding.startPageScroll.background = null
+            binding.startPageScroll.setBackgroundColor(
+                com.google.android.material.color.MaterialColors.getColor(binding.startPageScroll, com.google.android.material.R.attr.colorSurface)
+            )
+            return
+        }
+        runCatching {
+            contentResolver.openInputStream(android.net.Uri.parse(uriStr)).use { stream ->
+                val drawable = android.graphics.drawable.Drawable.createFromStream(stream, uriStr)
+                if (drawable != null) binding.startPageScroll.background = drawable
+            }
+        }
     }
 
     // ---- Panel (menu / tabs / bookmarks) ----
@@ -462,6 +554,8 @@ class MainActivity : AppCompatActivity() {
         tabManager.resumeActive()
         tabManager.applyGlobalScale()
         refreshStartPage()
+        setupFab()
+        applyStartBackground()
     }
 
     override fun onDestroy() {
