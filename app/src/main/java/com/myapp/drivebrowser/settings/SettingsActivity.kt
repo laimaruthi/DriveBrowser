@@ -54,6 +54,19 @@ class SettingsActivity : AppCompatActivity() {
         binding.labelVersion.text = getString(R.string.settings_version, BuildConfig.VERSION_NAME)
         binding.btnCheckUpdate.setOnClickListener { checkForUpdates() }
 
+        binding.btnUpdateBlocklist.setOnClickListener {
+            binding.btnUpdateBlocklist.isEnabled = false
+            binding.btnUpdateBlocklist.text = getString(R.string.blocklist_updating)
+            com.myapp.drivebrowser.adblock.AdBlocker.updateFromUrl(this, System.currentTimeMillis()) { ok, count ->
+                binding.btnUpdateBlocklist.isEnabled = true
+                binding.btnUpdateBlocklist.text = getString(R.string.settings_update_blocklist)
+                toastMsg(
+                    if (ok) getString(R.string.blocklist_updated, count)
+                    else getString(R.string.blocklist_update_failed)
+                )
+            }
+        }
+
         binding.btnPickBackground.setOnClickListener { pickBackground.launch(arrayOf("image/*")) }
         binding.btnClearBackground.setOnClickListener {
             BrowserPreferences.setStartBackgroundUri(this, null); toast()

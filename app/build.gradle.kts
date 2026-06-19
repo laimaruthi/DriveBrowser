@@ -1,3 +1,4 @@
+import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
@@ -6,6 +7,15 @@ plugins {
     // intentionally NOT applied here (doing so is an error since AGP 9.0).
     alias(libs.plugins.android.application)
 }
+
+// Signing properties come from environment variables (CI) or local.properties.
+val localProps = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) load(f.inputStream())
+}
+fun signingProp(key: String): String? = System.getenv(key) ?: localProps.getProperty(key)
+val releaseStorePath = signingProp("RELEASE_STORE_FILE")
+val hasReleaseSigning = releaseStorePath != null && rootProject.file(releaseStorePath).exists()
 
 android {
     namespace = "com.myapp.drivebrowser"
@@ -21,13 +31,32 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            if (hasReleaseSigning) {
+                storeFile = rootProject.file(releaseStorePath!!)
+                storePassword = signingProp("RELEASE_STORE_PASSWORD")
+                keyAlias = signingProp("RELEASE_KEY_ALIAS")
+                keyPassword = signingProp("RELEASE_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = true
+            // Minification disabled for now to guarantee a working signed APK without
+            // device testing; can be enabled once R8 output is verified on a device.
+            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Use the real release key when available, else fall back to debug signing
+            // so local `assembleRelease` still produces an installable APK.
+            signingConfig = if (hasReleaseSigning)
+                signingConfigs.getByName("release")
+            else
+                signingConfigs.getByName("debug")
         }
     }
 

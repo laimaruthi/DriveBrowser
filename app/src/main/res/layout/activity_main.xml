@@ -85,6 +85,15 @@
                     android:src="@drawable/ic_close"
                     android:visibility="gone"
                     android:contentDescription="@string/clear" />
+
+                <ImageButton
+                    android:id="@+id/btnMic"
+                    style="?attr/borderlessButtonStyle"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:padding="4dp"
+                    android:src="@drawable/ic_mic"
+                    android:contentDescription="@string/voice_search" />
             </LinearLayout>
 
             <ImageButton

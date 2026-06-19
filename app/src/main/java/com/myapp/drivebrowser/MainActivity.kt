@@ -78,6 +78,17 @@ class MainActivity : AppCompatActivity() {
     private val notificationLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
+    private val voiceSearchLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val spoken = result.data
+                    ?.getStringArrayListExtra(android.speech.RecognizerIntent.EXTRA_RESULTS)
+                    ?.firstOrNull()
+                    ?.trim()
+                if (!spoken.isNullOrEmpty()) loadUrl(BrowserPreferences.normalizeToUrlOrSearch(spoken))
+            }
+        }
+
     private val backgroundPicker =
         registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
             if (uri != null) {
@@ -97,6 +108,13 @@ class MainActivity : AppCompatActivity() {
 
         com.myapp.drivebrowser.adblock.AdBlocker.init(this)
         com.myapp.drivebrowser.data.SiteIconCache.init(this)
+
+        // Refresh the ad/tracker blocklist in the background if it's stale.
+        if (BrowserPreferences.isAdBlockEnabled(this) &&
+            com.myapp.drivebrowser.adblock.AdBlocker.isStale(this, System.currentTimeMillis())
+        ) {
+            com.myapp.drivebrowser.adblock.AdBlocker.updateFromUrl(this, System.currentTimeMillis())
+        }
 
         tabManager = TabManager(this, binding.webViewContainer, buildTabCallbacks())
 
@@ -190,6 +208,7 @@ class MainActivity : AppCompatActivity() {
         binding.btnTabs.setOnClickListener { showTabsPanel() }
         binding.btnMenu.setOnClickListener { showMenuPanel() }
         binding.btnClear.setOnClickListener { binding.addressEdit.setText("") }
+        binding.btnMic.setOnClickListener { startVoiceSearch() }
         binding.scrim.setOnClickListener { hidePanel() }
         binding.btnPanelClose.setOnClickListener { hidePanel() }
     }
@@ -347,6 +366,19 @@ class MainActivity : AppCompatActivity() {
             } else {
                 showMenuPanel()
             }
+        }
+    }
+
+    private fun startVoiceSearch() {
+        val intent = Intent(android.speech.RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(
+                android.speech.RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                android.speech.RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+            )
+            putExtra(android.speech.RecognizerIntent.EXTRA_PROMPT, getString(R.string.voice_search_prompt))
+        }
+        runCatching { voiceSearchLauncher.launch(intent) }.onFailure {
+            android.widget.Toast.makeText(this, R.string.voice_search_unavailable, android.widget.Toast.LENGTH_SHORT).show()
         }
     }
 

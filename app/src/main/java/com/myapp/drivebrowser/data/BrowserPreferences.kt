@@ -23,6 +23,7 @@ object BrowserPreferences {
     private const val KEY_RESTORE_TABS = "restore_tabs"
     private const val KEY_DESKTOP_DEFAULT = "desktop_default"
     private const val KEY_AD_BLOCK = "ad_block_enabled"
+    private const val KEY_BLOCKLIST_UPDATED = "blocklist_updated_at"
     private const val KEY_GLOBAL_SCALE = "global_scale_percent"
     private const val KEY_RESUME_LAST_PAGE = "resume_last_page"
     private const val KEY_LAST_PAGE = "last_page_url"
@@ -87,6 +88,10 @@ object BrowserPreferences {
     fun isAdBlockEnabled(context: Context) = prefs(context).getBoolean(KEY_AD_BLOCK, true)
     fun setAdBlockEnabled(context: Context, v: Boolean) =
         prefs(context).edit().putBoolean(KEY_AD_BLOCK, v).apply()
+
+    fun getBlocklistUpdatedAt(context: Context): Long = prefs(context).getLong(KEY_BLOCKLIST_UPDATED, 0L)
+    fun setBlocklistUpdatedAt(context: Context, v: Long) =
+        prefs(context).edit().putLong(KEY_BLOCKLIST_UPDATED, v).apply()
 
     /** Page/UI zoom percentage (50–200). */
     fun getGlobalScalePercent(context: Context) =

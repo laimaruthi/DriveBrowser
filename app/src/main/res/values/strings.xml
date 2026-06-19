@@ -16,6 +16,9 @@
     <string name="add_bookmark">Add bookmark</string>
     <string name="remove_bookmark">Remove bookmark</string>
     <string name="desktop_site">Desktop site</string>
+    <string name="voice_search">Voice search</string>
+    <string name="voice_search_prompt">Speak a site or search</string>
+    <string name="voice_search_unavailable">Voice input isn\'t available on this device</string>
     <string name="share_qr">Share page via QR</string>
     <string name="qr_dialog_title">Scan to open on your phone</string>
     <string name="clear">Clear</string>
@@ -72,6 +75,10 @@
     <string name="settings_restore_tabs">Restore tabs on launch</string>
     <string name="settings_desktop_default">Open sites in desktop mode</string>
     <string name="settings_ad_block">Block ads and trackers</string>
+    <string name="settings_update_blocklist">Update blocklist now</string>
+    <string name="blocklist_updating">Updating blocklist…</string>
+    <string name="blocklist_updated">Blocklist updated (%1$d domains)</string>
+    <string name="blocklist_update_failed">Blocklist update failed</string>
     <string name="settings_clear_cleartext">Clear allowed insecure sites</string>
     <string name="settings_clear_data">Clear browsing data</string>
     <string name="settings_save">Save</string>
