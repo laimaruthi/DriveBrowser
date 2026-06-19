@@ -5,6 +5,7 @@ import android.net.Uri
 import com.myapp.drivebrowser.model.AppThemeMode
 import com.myapp.drivebrowser.model.UserAgentProfile
 import org.json.JSONArray
+import org.json.JSONObject
 
 /**
  * Single source of truth for persisted settings, bookmarks, per-site permissions and
