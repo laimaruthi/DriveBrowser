@@ -2,8 +2,9 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
+    // AGP 9+ provides built-in Kotlin support, so the kotlin-android plugin is
+    // intentionally NOT applied here (doing so is an error since AGP 9.0).
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
 }
 
 android {
