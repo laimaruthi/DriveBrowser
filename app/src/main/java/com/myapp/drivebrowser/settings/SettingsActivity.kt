@@ -37,8 +37,19 @@ class SettingsActivity : AppCompatActivity() {
         switchRestoreTabs.isChecked = BrowserPreferences.isRestoreTabs(this@SettingsActivity)
         switchDesktop.isChecked = BrowserPreferences.isDesktopDefault(this@SettingsActivity)
         switchPersistentUrl.isChecked = BrowserPreferences.isPersistentUrlBar(this@SettingsActivity)
+        switchResumeLastPage.isChecked = BrowserPreferences.isResumeLastPage(this@SettingsActivity)
         switchDarkPages.isChecked = BrowserPreferences.isDarkPagesEnabled(this@SettingsActivity)
         switchAdBlock.isChecked = BrowserPreferences.isAdBlockEnabled(this@SettingsActivity)
+        val scale = BrowserPreferences.getGlobalScalePercent(this@SettingsActivity)
+        seekScale.progress = scale
+        labelScale.text = getString(R.string.settings_display_scale) + ": $scale%"
+        seekScale.setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(sb: android.widget.SeekBar, value: Int, fromUser: Boolean) {
+                labelScale.text = getString(R.string.settings_display_scale) + ": ${value.coerceAtLeast(50)}%"
+            }
+            override fun onStartTrackingTouch(sb: android.widget.SeekBar) {}
+            override fun onStopTrackingTouch(sb: android.widget.SeekBar) {}
+        })
         when (BrowserPreferences.getThemeMode(this@SettingsActivity)) {
             AppThemeMode.SYSTEM -> themeSystem.isChecked = true
             AppThemeMode.LIGHT -> themeLight.isChecked = true
@@ -52,6 +63,8 @@ class SettingsActivity : AppCompatActivity() {
         BrowserPreferences.setRestoreTabs(ctx, switchRestoreTabs.isChecked)
         BrowserPreferences.setDesktopDefault(ctx, switchDesktop.isChecked)
         BrowserPreferences.setPersistentUrlBar(ctx, switchPersistentUrl.isChecked)
+        BrowserPreferences.setResumeLastPage(ctx, switchResumeLastPage.isChecked)
+        BrowserPreferences.setGlobalScalePercent(ctx, seekScale.progress.coerceAtLeast(50))
         BrowserPreferences.setDarkPagesEnabled(ctx, switchDarkPages.isChecked)
         BrowserPreferences.setAdBlockEnabled(ctx, switchAdBlock.isChecked)
         com.myapp.drivebrowser.adblock.AdBlocker.setEnabled(switchAdBlock.isChecked)

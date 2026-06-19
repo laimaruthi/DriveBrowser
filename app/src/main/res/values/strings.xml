@@ -16,7 +16,14 @@
     <string name="add_bookmark">Add bookmark</string>
     <string name="remove_bookmark">Remove bookmark</string>
     <string name="desktop_site">Desktop site</string>
+    <string name="share_qr">Share page via QR</string>
+    <string name="qr_dialog_title">Scan to open on your phone</string>
     <string name="clear">Clear</string>
+    <string name="close">Close</string>
+
+    <string name="share_bookmark_activity_label">Add to DriveBrowser bookmarks</string>
+    <string name="share_bookmark_saved">Bookmark saved</string>
+    <string name="share_bookmark_failed">Couldn\'t save bookmark</string>
 
     <string name="tab_blank_title">New tab</string>
     <string name="tab_count">%1$d tabs</string>
@@ -59,6 +66,8 @@
     <string name="settings_theme_light">Light</string>
     <string name="settings_theme_dark">AMOLED dark</string>
     <string name="settings_dark_pages">Darken web pages in dark theme</string>
+    <string name="settings_display_scale">Display scale</string>
+    <string name="settings_resume_last_page">Resume last page on launch</string>
     <string name="settings_persistent_url">Always show address bar</string>
     <string name="settings_restore_tabs">Restore tabs on launch</string>
     <string name="settings_desktop_default">Open sites in desktop mode</string>

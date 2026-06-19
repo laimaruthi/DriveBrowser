@@ -273,6 +273,7 @@ private fun WebView.applyBrowserIdentity(profile: UserAgentProfile, desktop: Boo
     settings.loadWithOverviewMode = desktop
     if (desktop) setInitialScale(0)
     else setInitialScale((context.resources.displayMetrics.density * 100).toInt())
+    settings.textZoom = BrowserPreferences.getGlobalScalePercent(context)
 }
 
 private fun WebView.applyPageDarkening(enabled: Boolean) {

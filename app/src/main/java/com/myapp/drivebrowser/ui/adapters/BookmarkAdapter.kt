@@ -4,10 +4,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.myapp.drivebrowser.R
 import com.myapp.drivebrowser.data.BrowserPreferences.Bookmark
+import com.myapp.drivebrowser.data.SiteIconCache
 
 class BookmarkAdapter(
     private val onOpen: (String) -> Unit,
@@ -31,11 +33,15 @@ class BookmarkAdapter(
         val b = items[position]
         holder.title.text = b.title
         holder.url.text = b.url
+        val icon = SiteIconCache.load(b.url)
+        if (icon != null) holder.icon.setImageBitmap(icon)
+        else holder.icon.setImageResource(R.drawable.ic_public)
         holder.itemView.setOnClickListener { onOpen(b.url) }
         holder.delete.setOnClickListener { onDelete(b.url) }
     }
 
     class VH(v: View) : RecyclerView.ViewHolder(v) {
+        val icon: ImageView = v.findViewById(R.id.bookmarkIcon)
         val title: TextView = v.findViewById(R.id.bookmarkTitle)
         val url: TextView = v.findViewById(R.id.bookmarkUrl)
         val delete: ImageButton = v.findViewById(R.id.bookmarkDelete)

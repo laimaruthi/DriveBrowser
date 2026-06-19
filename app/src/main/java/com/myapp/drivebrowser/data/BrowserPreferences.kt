@@ -22,6 +22,9 @@ object BrowserPreferences {
     private const val KEY_RESTORE_TABS = "restore_tabs"
     private const val KEY_DESKTOP_DEFAULT = "desktop_default"
     private const val KEY_AD_BLOCK = "ad_block_enabled"
+    private const val KEY_GLOBAL_SCALE = "global_scale_percent"
+    private const val KEY_RESUME_LAST_PAGE = "resume_last_page"
+    private const val KEY_LAST_PAGE = "last_page_url"
     private const val KEY_BOOKMARKS = "bookmarks"
     private const val KEY_TAB_SESSION = "tab_session"
     private const val KEY_ALLOWED_CLEAR_HOSTS = "allowed_cleartext_hosts"
@@ -76,6 +79,21 @@ object BrowserPreferences {
     fun isAdBlockEnabled(context: Context) = prefs(context).getBoolean(KEY_AD_BLOCK, true)
     fun setAdBlockEnabled(context: Context, v: Boolean) =
         prefs(context).edit().putBoolean(KEY_AD_BLOCK, v).apply()
+
+    /** Page/UI zoom percentage (50–200). */
+    fun getGlobalScalePercent(context: Context) =
+        prefs(context).getInt(KEY_GLOBAL_SCALE, 100).coerceIn(50, 200)
+    fun setGlobalScalePercent(context: Context, percent: Int) =
+        prefs(context).edit().putInt(KEY_GLOBAL_SCALE, percent.coerceIn(50, 200)).apply()
+
+    fun isResumeLastPage(context: Context) = prefs(context).getBoolean(KEY_RESUME_LAST_PAGE, false)
+    fun setResumeLastPage(context: Context, v: Boolean) =
+        prefs(context).edit().putBoolean(KEY_RESUME_LAST_PAGE, v).apply()
+
+    fun getLastPageUrl(context: Context): String? =
+        prefs(context).getString(KEY_LAST_PAGE, null)?.takeIf { it.isNotBlank() }
+    fun setLastPageUrl(context: Context, url: String?) =
+        prefs(context).edit().putString(KEY_LAST_PAGE, url?.takeIf { it.isNotBlank() }.orEmpty()).apply()
 
     // ---- URL helpers ----
 

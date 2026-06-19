@@ -3,9 +3,11 @@ package com.myapp.drivebrowser.ui.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.myapp.drivebrowser.R
+import com.myapp.drivebrowser.data.SiteIconCache
 
 class StartPageAdapter(
     private val onOpen: (String) -> Unit
@@ -29,10 +31,14 @@ class StartPageAdapter(
     override fun onBindViewHolder(holder: VH, position: Int) {
         val slot = items[position]
         holder.label.text = slot.label
+        val icon = SiteIconCache.load(slot.url)
+        if (icon != null) holder.icon.setImageBitmap(icon)
+        else holder.icon.setImageResource(R.drawable.ic_public)
         holder.itemView.setOnClickListener { onOpen(slot.url) }
     }
 
     class VH(v: View) : RecyclerView.ViewHolder(v) {
+        val icon: ImageView = v.findViewById(R.id.slotIcon)
         val label: TextView = v.findViewById(R.id.slotLabel)
     }
 }

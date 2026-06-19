@@ -13,6 +13,7 @@ import android.widget.FrameLayout
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.myapp.drivebrowser.data.BrowserPreferences
+import com.myapp.drivebrowser.data.SiteIconCache
 import com.myapp.drivebrowser.web.BrowserCallbacks
 import com.myapp.drivebrowser.web.SpeechRecognitionBridge
 import com.myapp.drivebrowser.web.configureWebView
@@ -80,9 +81,13 @@ class TabManager(
     private fun buildCallbacks(tab: BrowserTab) = BrowserCallbacks(
         onUrlChange = { url ->
             tab.currentUrl = url
-            if (tab.id == activeId) emitActive()
+            if (tab.id == activeId) {
+                emitActive()
+                if (url.startsWith("http")) BrowserPreferences.setLastPageUrl(activity, url)
+            }
             persistSession()
         },
+        onFaviconReceived = { url, bitmap -> SiteIconCache.save(url, bitmap) },
         onTitleChange = { title ->
             tab.title = title.orEmpty()
             if (tab.id == activeId) emitActive()
@@ -178,13 +183,20 @@ class TabManager(
         val home = BrowserPreferences.getHomePageUrl(activity)
         val session = if (home == null && BrowserPreferences.isRestoreTabs(activity))
             BrowserPreferences.loadTabSession(activity) else emptyList()
+        val lastPage = if (home == null && BrowserPreferences.isResumeLastPage(activity))
+            BrowserPreferences.getLastPageUrl(activity) else null
         when {
             home != null -> createTab(home, activate = true)
-            session.isNotEmpty() -> {
-                session.forEachIndexed { i, url -> createTab(url, activate = i == 0) }
-            }
+            session.isNotEmpty() -> session.forEachIndexed { i, url -> createTab(url, activate = i == 0) }
+            lastPage != null -> createTab(lastPage, activate = true)
             else -> createTab(null, activate = true) // blank -> start page
         }
+    }
+
+    /** Reapplies the global display-scale percentage to every open tab live (no reload). */
+    fun applyGlobalScale() {
+        val scale = BrowserPreferences.getGlobalScalePercent(activity)
+        tabs.forEach { it.webView.settings.textZoom = scale }
     }
 
     fun pauseActive() { activeTab?.webView?.onPause() }

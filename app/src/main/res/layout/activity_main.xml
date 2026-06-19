@@ -285,6 +285,15 @@
                 app:icon="@drawable/ic_desktop" />
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/menuQr"
+                style="@style/Widget.Material3.Button.TextButton.Icon"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start|center_vertical"
+                android:text="@string/share_qr"
+                app:icon="@drawable/ic_qr" />
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/menuSettings"
                 style="@style/Widget.Material3.Button.TextButton.Icon"
                 android:layout_width="match_parent"

@@ -44,6 +44,11 @@
             style="@style/SettingsSwitch"
             android:text="@string/settings_persistent_url" />
 
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchResumeLastPage"
+            style="@style/SettingsSwitch"
+            android:text="@string/settings_resume_last_page" />
+
         <!-- Appearance -->
         <TextView style="@style/SettingsHeader" android:text="@string/settings_appearance" />
 
@@ -61,6 +66,22 @@
             android:id="@+id/switchDarkPages"
             style="@style/SettingsSwitch"
             android:text="@string/settings_dark_pages" />
+
+        <TextView
+            android:id="@+id/labelScale"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="15sp"
+            android:text="@string/settings_display_scale" />
+
+        <SeekBar
+            android:id="@+id/seekScale"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:min="50"
+            android:max="200" />
 
         <!-- Privacy -->
         <TextView style="@style/SettingsHeader" android:text="@string/settings_privacy" />

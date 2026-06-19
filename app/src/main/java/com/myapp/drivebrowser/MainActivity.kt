@@ -85,6 +85,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         com.myapp.drivebrowser.adblock.AdBlocker.init(this)
+        com.myapp.drivebrowser.data.SiteIconCache.init(this)
 
         tabManager = TabManager(this, binding.webViewContainer, buildTabCallbacks())
 
@@ -193,6 +194,7 @@ class MainActivity : AppCompatActivity() {
         binding.menuDesktop.setOnClickListener {
             tabManager.setDesktopMode(!tabManager.isDesktopMode); hidePanel()
         }
+        binding.menuQr.setOnClickListener { showQrForCurrentPage(); hidePanel() }
         binding.menuSettings.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java)); hidePanel()
         }
@@ -291,6 +293,27 @@ class MainActivity : AppCompatActivity() {
     private fun hidePanel() {
         binding.scrim.isVisible = false
         binding.panel.isVisible = false
+    }
+
+    private fun showQrForCurrentPage() {
+        val url = tabManager.activeTab?.currentUrl?.takeIf { it.startsWith("http") }
+        if (url == null) {
+            android.widget.Toast.makeText(this, R.string.start_page_title, android.widget.Toast.LENGTH_SHORT).show()
+            return
+        }
+        val bitmap = com.myapp.drivebrowser.ui.QrUtils.encode(url) ?: return
+        val image = android.widget.ImageView(this).apply {
+            setImageBitmap(bitmap)
+            val pad = (24 * resources.displayMetrics.density).toInt()
+            setPadding(pad, pad, pad, pad)
+            adjustViewBounds = true
+        }
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.qr_dialog_title)
+            .setMessage(url)
+            .setView(image)
+            .setPositiveButton(R.string.close, null)
+            .show()
     }
 
     private fun toggleBookmark() {
@@ -437,6 +460,8 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         tabManager.resumeActive()
+        tabManager.applyGlobalScale()
+        refreshStartPage()
     }
 
     override fun onDestroy() {
