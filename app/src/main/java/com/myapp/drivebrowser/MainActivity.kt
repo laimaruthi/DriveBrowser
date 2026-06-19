@@ -50,6 +50,8 @@ class MainActivity : AppCompatActivity() {
     private var pendingMicHost: String? = null
     private var pendingGeoOrigin: String? = null
     private var pendingGeoCallback: GeolocationPermissions.Callback? = null
+    private var pendingSpeechResult: ((Boolean) -> Unit)? = null
+    private var pendingSpeechHost: String? = null
 
     private val micPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
@@ -58,6 +60,14 @@ class MainActivity : AppCompatActivity() {
                 pendingMicHost?.let { BrowserPreferences.addAllowedMicHost(this, it) }
                 request.grant(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE))
             } else request?.deny()
+        }
+
+    private val speechMicPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            val result = pendingSpeechResult; pendingSpeechResult = null
+            if (granted) pendingSpeechHost?.let { BrowserPreferences.addAllowedMicHost(this, it) }
+            pendingSpeechHost = null
+            result?.invoke(granted)
         }
 
     private val locationPermissionLauncher =
@@ -118,6 +128,7 @@ class MainActivity : AppCompatActivity() {
         onEnterFullscreen = { view, cb -> enterFullscreen(view, cb) },
         onExitFullscreen = { exitFullscreen() },
         onMicRequest = { request -> handleMicRequest(request) },
+        onSpeechMicRequest = { origin, result -> handleSpeechMicRequest(origin, result) },
         onGeolocationRequest = { origin, cb -> handleGeoRequest(origin, cb) },
         onDownload = { uri -> openExternally(uri) }
     )
@@ -313,6 +324,28 @@ class MainActivity : AppCompatActivity() {
                     request.grant(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE))
                 } else {
                     micPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                }
+            }
+            .show()
+    }
+
+    /** Microphone consent for the Web Speech API bridge. Resolves [result] with the decision. */
+    private fun handleSpeechMicRequest(origin: String?, result: (Boolean) -> Unit) {
+        val host = runCatching { Uri.parse(origin).host?.lowercase() }.getOrNull()
+        if (BrowserPreferences.isHostAllowedMic(this, host) && PermissionManager.hasAudio(this)) {
+            result(true); return
+        }
+        MaterialAlertDialogBuilder(this)
+            .setMessage(getString(R.string.permission_mic_message, host ?: origin.orEmpty()))
+            .setNegativeButton(R.string.permission_deny) { _, _ -> result(false) }
+            .setPositiveButton(R.string.permission_allow) { _, _ ->
+                if (PermissionManager.hasAudio(this)) {
+                    host?.let { BrowserPreferences.addAllowedMicHost(this, it) }
+                    result(true)
+                } else {
+                    pendingSpeechResult = result
+                    pendingSpeechHost = host
+                    speechMicPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
                 }
             }
             .show()

@@ -10,8 +10,11 @@ import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.widget.FrameLayout
+import androidx.webkit.WebViewCompat
+import androidx.webkit.WebViewFeature
 import com.myapp.drivebrowser.data.BrowserPreferences
 import com.myapp.drivebrowser.web.BrowserCallbacks
+import com.myapp.drivebrowser.web.SpeechRecognitionBridge
 import com.myapp.drivebrowser.web.configureWebView
 import com.myapp.drivebrowser.web.releaseCompletely
 import com.myapp.drivebrowser.web.updateDesktopMode
@@ -25,6 +28,7 @@ data class TabCallbacks(
     val onEnterFullscreen: (View, WebChromeClient.CustomViewCallback) -> Unit = { _, _ -> },
     val onExitFullscreen: () -> Unit = {},
     val onMicRequest: (PermissionRequest) -> Unit = { it.deny() },
+    val onSpeechMicRequest: (origin: String?, result: (Boolean) -> Unit) -> Unit = { _, result -> result(false) },
     val onGeolocationRequest: (String?, GeolocationPermissions.Callback?) -> Unit = { _, c -> c?.invoke(null, false, false) },
     val onDownload: (Uri) -> Unit = {}
 )
@@ -63,6 +67,8 @@ class TabManager(
             allowDarkPages = BrowserPreferences.isDarkPagesEnabled(activity)
         )
 
+        setupSpeechBridge(tab)
+
         container.addView(webView)
         tabs.add(tab)
 
@@ -93,6 +99,26 @@ class TabManager(
         onGeolocationPermissionRequest = { origin, cb -> callbacks.onGeolocationRequest(origin, cb) }
     )
 
+    /** Creates the page's speech bridge and connects the JS message channel to it. */
+    private fun setupSpeechBridge(tab: BrowserTab) {
+        if (!WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) return
+        val bridge = SpeechRecognitionBridge(tab.webView) { origin ->
+            callbacks.onSpeechMicRequest(origin) { granted ->
+                tab.speechBridge?.onPermissionResult(granted)
+            }
+        }
+        tab.speechBridge = bridge
+        // Origin rule is the wildcard; the bridge itself re-validates that each message
+        // comes from the main frame of the currently loaded page before acting.
+        WebViewCompat.addWebMessageListener(
+            tab.webView,
+            SpeechRecognitionBridge.BRIDGE_OBJECT_NAME,
+            setOf("*")
+        ) { wv, message, sourceOrigin, isMainFrame, _ ->
+            bridge.handleWebMessage(message, sourceOrigin, isMainFrame, wv.url)
+        }
+    }
+
     private fun emitActive() {
         val tab = activeTab ?: return
         callbacks.onActiveTabUpdated(tab.title, tab.currentUrl, tab.webView.canGoBack(), tab.webView.canGoForward())
@@ -113,6 +139,7 @@ class TabManager(
         val index = tabs.indexOfFirst { it.id == tabId }
         if (index < 0) return
         val tab = tabs.removeAt(index)
+        tab.speechBridge?.destroy()
         tab.webView.releaseCompletely()
         if (tab.id == activeId) {
             val next = tabs.getOrNull(index) ?: tabs.getOrNull(index - 1)
@@ -164,7 +191,7 @@ class TabManager(
     fun resumeActive() { activeTab?.webView?.onResume() }
 
     fun destroyAll() {
-        tabs.forEach { it.webView.releaseCompletely() }
+        tabs.forEach { it.speechBridge?.destroy(); it.webView.releaseCompletely() }
         tabs.clear()
     }
 }

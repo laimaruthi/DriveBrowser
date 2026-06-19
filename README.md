@@ -33,6 +33,8 @@ A single `MainActivity` coordinates focused, modular components:
 - ✅ Desktop / mobile mode toggle with Chrome/Safari UA profiles
 - ✅ Fullscreen video (e.g. DRM L3 playback handled by WebView)
 - ✅ Microphone (getUserMedia) and geolocation permission flows with per-site consent
+- ✅ **Voice / Web Speech API** (`webkitSpeechRecognition`) bridge to native `SpeechRecognizer`,
+  origin-validated and gated by the per-site microphone consent flow
 - ✅ Settings: home page, theme, restore tabs, desktop default, persistent URL bar, clear data
 
 ### Security posture (hardened vs. typical WebView defaults)
@@ -45,7 +47,6 @@ A single `MainActivity` coordinates focused, modular components:
 
 ## Not yet implemented (good next steps)
 
-- Web Speech API (`webkitSpeechRecognition`) JavaScript bridge — voice dictation in pages
 - Cached site icons / favicons on start-page cards
 - QR code utilities (zxing dependency is wired in but unused)
 - Configurable floating quick-action button, global display scale

@@ -101,6 +101,7 @@ fun configureWebView(
 
             override fun onPageFinished(view: WebView, url: String?) {
                 super.onPageFinished(view, url)
+                view.evaluateJavascript(SpeechRecognitionBridge.POLYFILL_JS, null)
                 url?.let { callbacks.onUrlChange(it) }
             }
 
