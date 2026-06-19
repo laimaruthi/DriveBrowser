@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Top toolbar -->
+        <LinearLayout
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_height"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="6dp"
+            android:background="?attr/colorSurface">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                style="?attr/borderlessButtonStyle"
+                android:layout_width="@dimen/icon_button_size"
+                android:layout_height="@dimen/icon_button_size"
+                android:src="@drawable/ic_arrow_back"
+                android:contentDescription="@string/back" />
+
+            <ImageButton
+                android:id="@+id/btnForward"
+                style="?attr/borderlessButtonStyle"
+                android:layout_width="@dimen/icon_button_size"
+                android:layout_height="@dimen/icon_button_size"
+                android:src="@drawable/ic_arrow_forward"
+                android:contentDescription="@string/forward" />
+
+            <ImageButton
+                android:id="@+id/btnReload"
+                style="?attr/borderlessButtonStyle"
+                android:layout_width="@dimen/icon_button_size"
+                android:layout_height="@dimen/icon_button_size"
+                android:src="@drawable/ic_refresh"
+                android:contentDescription="@string/reload" />
+
+            <!-- URL bar -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="6dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_url_bar"
+                android:paddingHorizontal="12dp">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_search"
+                    android:contentDescription="@string/go" />
+
+                <EditText
+                    android:id="@+id/addressEdit"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:background="@null"
+                    android:hint="@string/address_hint"
+                    android:imeOptions="actionGo"
+                    android:inputType="textUri"
+                    android:maxLines="1"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textColorHint="?attr/colorOnSurfaceVariant"
+                    android:textSize="15sp" />
+
+                <ImageButton
+                    android:id="@+id/btnClear"
+                    style="?attr/borderlessButtonStyle"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:padding="4dp"
+                    android:src="@drawable/ic_close"
+                    android:visibility="gone"
+                    android:contentDescription="@string/clear" />
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/btnHome"
+                style="?attr/borderlessButtonStyle"
+                android:layout_width="@dimen/icon_button_size"
+                android:layout_height="@dimen/icon_button_size"
+                android:src="@drawable/ic_home"
+                android:contentDescription="@string/home" />
+
+            <FrameLayout
+                android:layout_width="@dimen/icon_button_size"
+                android:layout_height="@dimen/icon_button_size">
+
+                <ImageButton
+                    android:id="@+id/btnTabs"
+                    style="?attr/borderlessButtonStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_tabs"
+                    android:contentDescription="@string/tabs" />
+
+                <TextView
+                    android:id="@+id/tabCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="1"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/colorOnSurface" />
+            </FrameLayout>
+
+            <ImageButton
+                android:id="@+id/btnMenu"
+                style="?attr/borderlessButtonStyle"
+                android:layout_width="@dimen/icon_button_size"
+                android:layout_height="@dimen/icon_button_size"
+                android:src="@drawable/ic_menu"
+                android:contentDescription="@string/menu" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?attr/colorOutline" />
+
+        <!-- Progress -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:max="100"
+            android:visibility="gone" />
+
+        <!-- Content area: web views + start page stacked -->
+        <FrameLayout
+            android:id="@+id/contentFrame"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <FrameLayout
+                android:id="@+id/webViewContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/startPageScroll"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true"
+                android:background="?attr/colorSurface">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="24dp"
+                    android:gravity="center_horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:layout_marginBottom="24dp"
+                        android:text="@string/start_page_title"
+                        android:textSize="28sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/startPageRecycler"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false" />
+                </LinearLayout>
+            </androidx.core.widget.NestedScrollView>
+        </FrameLayout>
+    </LinearLayout>
+
+    <!-- Fullscreen video container -->
+    <FrameLayout
+        android:id="@+id/fullscreenContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black"
+        android:visibility="gone" />
+
+    <!-- Dim scrim behind panel -->
+    <View
+        android:id="@+id/scrim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/scrim"
+        android:visibility="gone" />
+
+    <!-- Slide-up panel (menu / tabs / bookmarks) -->
+    <LinearLayout
+        android:id="@+id/panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical"
+        android:background="?attr/colorSurface"
+        android:paddingBottom="12dp"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/panelTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/menu"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurface" />
+
+            <ImageButton
+                android:id="@+id/btnPanelClose"
+                style="?attr/borderlessButtonStyle"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_close"
+                android:contentDescription="@string/clear" />
+        </LinearLayout>
+
+        <!-- Static menu actions -->
+        <LinearLayout
+            android:id="@+id/menuList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="12dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/menuNewTab"
+                style="@style/Widget.Material3.Button.TextButton.Icon"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start|center_vertical"
+                android:text="@string/new_tab"
+                app:icon="@drawable/ic_add" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/menuBookmark"
+                style="@style/Widget.Material3.Button.TextButton.Icon"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start|center_vertical"
+                android:text="@string/add_bookmark"
+                app:icon="@drawable/ic_bookmark_add" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/menuBookmarks"
+                style="@style/Widget.Material3.Button.TextButton.Icon"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start|center_vertical"
+                android:text="@string/bookmarks"
+                app:icon="@drawable/ic_public" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/menuDesktop"
+                style="@style/Widget.Material3.Button.TextButton.Icon"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start|center_vertical"
+                android:text="@string/desktop_site"
+                app:icon="@drawable/ic_desktop" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/menuSettings"
+                style="@style/Widget.Material3.Button.TextButton.Icon"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start|center_vertical"
+                android:text="@string/settings_title"
+                app:icon="@drawable/ic_settings" />
+        </LinearLayout>
+
+        <!-- Tabs / bookmarks list -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/panelRecycler"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxHeight="320dp"
+            android:paddingHorizontal="12dp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+</FrameLayout>

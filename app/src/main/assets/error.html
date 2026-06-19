@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Unable to reach site</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: Roboto, Arial, sans-serif; margin:0; padding:24px; }
+    .card { max-width:720px; margin:36px auto; border-radius:12px; padding:20px;
+            background:rgba(127,127,127,0.12); }
+    h1 { margin:0 0 8px 0; font-size:20px; }
+    p { margin:8px 0; }
+    ul { margin:8px 0 16px 20px; }
+    .actions { display:flex; gap:8px; flex-wrap:wrap; }
+    button { background:#1f6feb; color:#fff; border:none; padding:12px 18px;
+             border-radius:8px; cursor:pointer; font-size:15px; }
+    button.secondary { background:rgba(127,127,127,0.25); color:inherit; }
+    .small { font-size:13px; opacity:0.7; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Can't reach this site</h1>
+    <p>We couldn't load the page you requested. Possible reasons:</p>
+    <ul>
+      <li>The device is offline (no network connection).</li>
+      <li>A DNS problem or the domain name can't be resolved.</li>
+      <li>The server is down or temporarily unreachable.</li>
+      <li>A secure connection (TLS) failed.</li>
+    </ul>
+    <div class="actions">
+      <button id="retry">Retry</button>
+      <button id="openExternal" class="secondary">Open externally</button>
+    </div>
+  </div>
+
+  <script>
+    function getParam(name) {
+      return new URLSearchParams(location.search).get(name) || '';
+    }
+    var failed = decodeURIComponent(getParam('failedUrl') || '');
+    var code = getParam('code') || '';
+    var message = decodeURIComponent(getParam('message') || '');
+
+    if (code || message) {
+      var info = document.createElement('p');
+      info.className = 'small';
+      // textContent (never innerHTML) — reflected params can never inject markup.
+      info.textContent = (code ? ('Error code: ' + code + (message ? ' — ' : '')) : '') + (message || '');
+      document.querySelector('.card').appendChild(info);
+    }
+
+    document.getElementById('retry').addEventListener('click', function () {
+      if (/^https?:\/\//i.test(failed)) location.href = failed; else location.reload();
+    });
+    document.getElementById('openExternal').addEventListener('click', function () {
+      if (typeof Android !== 'undefined' && Android.openExternal) {
+        try { Android.openExternal(failed || ''); } catch (e) {}
+      }
+    });
+  </script>
+</body>
+</html>

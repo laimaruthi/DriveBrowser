@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- True-black AMOLED surfaces for car displays -->
+    <color name="surface">#000000</color>
+    <color name="surface_variant">#121212</color>
+    <color name="on_surface">#E6E6E6</color>
+    <color name="on_surface_variant">#AAAAAA</color>
+    <color name="outline">#2A2A2A</color>
+</resources>

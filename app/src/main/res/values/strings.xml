@@ -1,0 +1,72 @@
+<resources>
+    <string name="app_name">DriveBrowser</string>
+    <string name="settings_title">Settings</string>
+
+    <string name="address_hint">Search or type URL</string>
+    <string name="go">Go</string>
+    <string name="menu">Menu</string>
+    <string name="back">Back</string>
+    <string name="forward">Forward</string>
+    <string name="reload">Reload</string>
+    <string name="home">Home</string>
+    <string name="new_tab">New tab</string>
+    <string name="tabs">Tabs</string>
+    <string name="close_tab">Close tab</string>
+    <string name="bookmarks">Bookmarks</string>
+    <string name="add_bookmark">Add bookmark</string>
+    <string name="remove_bookmark">Remove bookmark</string>
+    <string name="desktop_site">Desktop site</string>
+    <string name="clear">Clear</string>
+
+    <string name="tab_blank_title">New tab</string>
+    <string name="tab_count">%1$d tabs</string>
+
+    <!-- Cleartext / SSL prompts -->
+    <string name="cleartext_title">Insecure connection</string>
+    <string name="cleartext_message">"%1$s" uses an unencrypted (HTTP) connection. Information you send could be read or changed by others on the network.</string>
+    <string name="cleartext_host_label">Site</string>
+    <string name="cleartext_allow_once">Continue once</string>
+    <string name="cleartext_allow_host">Always allow this site</string>
+    <string name="cleartext_cancel">Cancel</string>
+
+    <string name="ssl_error_title">Security warning</string>
+    <string name="ssl_error_message">The security certificate for "%1$s" is not trusted.</string>
+    <string name="ssl_error_reason_prefix">Reason:</string>
+    <string name="ssl_error_proceed">Proceed anyway</string>
+    <string name="ssl_error_cancel">Go back</string>
+    <string name="ssl_error_expired">The certificate has expired.</string>
+    <string name="ssl_error_idmismatch">The certificate does not match this site.</string>
+    <string name="ssl_error_untrusted">The certificate is from an untrusted authority.</string>
+    <string name="ssl_error_notyetvalid">The certificate is not yet valid.</string>
+    <string name="ssl_error_date_invalid">The certificate date is invalid.</string>
+    <string name="ssl_error_invalid">The certificate is invalid.</string>
+
+    <!-- Permissions -->
+    <string name="permission_mic_message">Allow "%1$s" to use the microphone?</string>
+    <string name="permission_location_message">Allow "%1$s" to access your location?</string>
+    <string name="permission_allow">Allow</string>
+    <string name="permission_deny">Deny</string>
+
+    <!-- Settings -->
+    <string name="settings_general">General</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_privacy">Privacy</string>
+    <string name="settings_home_page">Home page</string>
+    <string name="settings_home_page_hint">Leave blank for the start page</string>
+    <string name="settings_search_engine">Search engine</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_theme_system">Follow system</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">AMOLED dark</string>
+    <string name="settings_dark_pages">Darken web pages in dark theme</string>
+    <string name="settings_persistent_url">Always show address bar</string>
+    <string name="settings_restore_tabs">Restore tabs on launch</string>
+    <string name="settings_desktop_default">Open sites in desktop mode</string>
+    <string name="settings_clear_cleartext">Clear allowed insecure sites</string>
+    <string name="settings_clear_data">Clear browsing data</string>
+    <string name="settings_save">Save</string>
+    <string name="settings_cleared">Cleared</string>
+
+    <string name="start_page_title">DriveBrowser</string>
+    <string name="error_page_title">Can\'t reach this site</string>
+</resources>

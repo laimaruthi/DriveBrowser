@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Cleartext (HTTP) is permitted app-wide, but the browser gates every top-level
+  HTTP navigation behind an explicit per-host consent prompt (see ConfiguredWebView).
+  Only the system CA store is trusted for TLS — user-installed CAs are intentionally
+  NOT trusted, to keep TLS resistant to locally installed interception certificates.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
