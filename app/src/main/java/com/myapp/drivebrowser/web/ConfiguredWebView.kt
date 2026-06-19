@@ -228,16 +228,18 @@ private fun handleCleartextIfNeeded(
 
     if (onPageStart) view.stopLoading()
 
-    val allowOnce = {
+    val allowOnce: () -> Unit = {
         view.setTag(ALLOW_ONCE_TAG, asString)
         view.post { view.loadUrl(asString) }
+        Unit
     }
-    val allowHost = {
+    val allowHost: () -> Unit = {
         host?.let { BrowserPreferences.addAllowedCleartextHost(view.context, it) }
         view.setTag(ALLOW_ONCE_TAG, asString)
         view.post { view.loadUrl(asString) }
+        Unit
     }
-    val cancel = { if (onPageStart) view.stopLoading() }
+    val cancel: () -> Unit = { if (onPageStart) view.stopLoading() }
     callbacks.onCleartextNavigationRequested(uri, allowOnce, allowHost, cancel)
     return true
 }
