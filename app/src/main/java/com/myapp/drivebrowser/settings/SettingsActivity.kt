@@ -3,6 +3,7 @@ package com.myapp.drivebrowser.settings
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.myapp.drivebrowser.R
 import com.myapp.drivebrowser.data.BrowserPreferences
 import com.myapp.drivebrowser.databinding.ActivitySettingsBinding
 import com.myapp.drivebrowser.model.AppThemeMode
