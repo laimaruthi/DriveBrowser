@@ -78,6 +78,17 @@ class MainActivity : AppCompatActivity() {
     private val notificationLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
+    private val backgroundPicker =
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            if (uri != null) {
+                runCatching {
+                    contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+                BrowserPreferences.setStartBackgroundUri(this, uri.toString())
+                applyStartBackground()
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         ThemeManager.applyStoredTheme(this)
         super.onCreate(savedInstanceState)
@@ -164,7 +175,7 @@ class MainActivity : AppCompatActivity() {
             onOpen = { url -> loadUrl(url) },
             onEdit = { index -> editQuickLink(index) }
         )
-        binding.startPageRecycler.layoutManager = GridLayoutManager(this, 3)
+        binding.startPageRecycler.layoutManager = GridLayoutManager(this, 2)
         binding.startPageRecycler.adapter = startPageAdapter
     }
 
@@ -204,16 +215,33 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupMenu() {
-        binding.menuNewTab.setOnClickListener { tabManager.createTab(BrowserPreferences.getHomePageUrl(this), true); hidePanel(); updateContentVisibility() }
-        binding.menuBookmark.setOnClickListener { toggleBookmark(); hidePanel() }
-        binding.menuBookmarks.setOnClickListener { showBookmarksPanel() }
-        binding.menuDesktop.setOnClickListener {
-            tabManager.setDesktopMode(!tabManager.isDesktopMode); hidePanel()
+        binding.menuAddressBar.setOnClickListener {
+            hidePanel(); binding.addressEdit.requestFocus(); showKeyboard()
         }
-        binding.menuQr.setOnClickListener { showQrForCurrentPage(); hidePanel() }
-        binding.menuSettings.setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java)); hidePanel()
+        binding.footerVersion.text = getString(R.string.menu_footer, com.myapp.drivebrowser.BuildConfig.VERSION_NAME)
+        binding.btnCheckUpdates.setOnClickListener { checkForUpdatesFromMenu() }
+        binding.btnGithub.setOnClickListener { openExternally(android.net.Uri.parse(GITHUB_REPO_URL)) }
+
+        binding.btnResumeLast.setOnClickListener {
+            val last = BrowserPreferences.getLastPageUrl(this)
+            if (last != null) loadUrl(last)
+            else android.widget.Toast.makeText(this, R.string.empty_slot_hint, android.widget.Toast.LENGTH_SHORT).show()
         }
+        binding.btnPhoto.setOnClickListener { backgroundPicker.launch(arrayOf("image/*")) }
+    }
+
+    private fun configTile(
+        tile: com.myapp.drivebrowser.databinding.MenuTileBinding,
+        iconRes: Int,
+        labelRes: Int,
+        enabled: Boolean = true,
+        onClick: () -> Unit
+    ) {
+        tile.tileIcon.setImageResource(iconRes)
+        tile.tileLabel.setText(labelRes)
+        tile.root.isEnabled = enabled
+        tile.root.alpha = if (enabled) 1f else 0.4f
+        tile.root.setOnClickListener { if (enabled) onClick() }
     }
 
     private fun setupBackHandling() {
@@ -330,31 +358,82 @@ class MainActivity : AppCompatActivity() {
     private fun applyStartBackground() {
         val uriStr = BrowserPreferences.getStartBackgroundUri(this)
         if (uriStr == null) {
-            binding.startPageScroll.background = null
-            binding.startPageScroll.setBackgroundColor(
-                com.google.android.material.color.MaterialColors.getColor(binding.startPageScroll, com.google.android.material.R.attr.colorSurface)
-            )
+            binding.startPageScroll.setBackgroundResource(R.drawable.bg_start_gradient)
             return
         }
-        runCatching {
+        val applied = runCatching {
             contentResolver.openInputStream(android.net.Uri.parse(uriStr)).use { stream ->
                 val drawable = android.graphics.drawable.Drawable.createFromStream(stream, uriStr)
-                if (drawable != null) binding.startPageScroll.background = drawable
+                if (drawable != null) { binding.startPageScroll.background = drawable; true } else false
             }
-        }
+        }.getOrDefault(false)
+        if (!applied) binding.startPageScroll.setBackgroundResource(R.drawable.bg_start_gradient)
+    }
+
+    companion object {
+        private const val GITHUB_REPO_URL = "https://github.com/laimaruthi/DriveBrowser"
     }
 
     // ---- Panel (menu / tabs / bookmarks) ----
 
     private fun showMenuPanel() {
-        binding.panelTitle.text = getString(R.string.menu)
+        binding.panelTitle.text = getString(R.string.start_page_title)
+        binding.panelSubtitle.text = getString(R.string.menu_start_page_subtitle)
         binding.menuList.isVisible = true
         binding.panelRecycler.isVisible = false
-        binding.menuBookmark.setText(
-            if (BrowserPreferences.isBookmarked(this, tabManager.activeTab?.currentUrl))
-                R.string.remove_bookmark else R.string.add_bookmark
-        )
+
+        val tab = tabManager.activeTab
+        val wv = tab?.webView
+        val currentUrl = tab?.currentUrl.orEmpty()
+        val isWebPage = currentUrl.startsWith("http")
+        val isBookmarked = BrowserPreferences.isBookmarked(this, currentUrl)
+
+        configTile(binding.tileBack, R.drawable.ic_arrow_back, R.string.back, enabled = wv?.canGoBack() == true) { tabManager.goBack(); hidePanel() }
+        configTile(binding.tileReload, R.drawable.ic_refresh, R.string.reload) { tabManager.reload(); hidePanel() }
+        configTile(binding.tileForward, R.drawable.ic_arrow_forward, R.string.forward, enabled = wv?.canGoForward() == true) { tabManager.goForward(); hidePanel() }
+
+        configTile(binding.tileBookmarks, R.drawable.ic_public, R.string.bookmarks) { showBookmarksPanel() }
+        configTile(binding.tileExternal, R.drawable.ic_open_in_new, R.string.menu_external, enabled = isWebPage) { openExternally(android.net.Uri.parse(currentUrl)); hidePanel() }
+        configTile(binding.tileSettings, R.drawable.ic_settings, R.string.settings_title) { startActivity(Intent(this, SettingsActivity::class.java)); hidePanel() }
+
+        configTile(binding.tileStartPage, R.drawable.ic_home, R.string.menu_start_page_subtitle) { showStartPage(); hidePanel() }
+        configTile(binding.tileTabs, R.drawable.ic_tabs, R.string.tabs) { showTabsPanel() }
+        configTile(binding.tileNewTab, R.drawable.ic_add, R.string.new_tab) { tabManager.createTab(BrowserPreferences.getHomePageUrl(this), true); hidePanel(); updateContentVisibility() }
+
+        configTile(
+            binding.tileBookmarkToggle,
+            if (isBookmarked) R.drawable.ic_bookmark_remove else R.drawable.ic_bookmark_add,
+            if (isBookmarked) R.string.remove_bookmark else R.string.add_bookmark,
+            enabled = isWebPage
+        ) { toggleBookmark(); hidePanel() }
+        configTile(binding.tileQr, R.drawable.ic_qr, R.string.share_qr, enabled = isWebPage) { showQrForCurrentPage(); hidePanel() }
+
+        binding.menuDesktopSwitch.setOnCheckedChangeListener(null)
+        binding.menuDesktopSwitch.isChecked = tabManager.isDesktopMode
+        binding.menuDesktopSwitch.setOnCheckedChangeListener { _, checked -> tabManager.setDesktopMode(checked) }
+
         openPanel()
+    }
+
+    private fun checkForUpdatesFromMenu() {
+        android.widget.Toast.makeText(this, R.string.update_checking, android.widget.Toast.LENGTH_SHORT).show()
+        com.myapp.drivebrowser.update.UpdateChecker.check(com.myapp.drivebrowser.BuildConfig.VERSION_NAME) { r ->
+            when {
+                r.error != null ->
+                    android.widget.Toast.makeText(this, getString(R.string.update_failed, r.error), android.widget.Toast.LENGTH_LONG).show()
+                r.updateAvailable ->
+                    MaterialAlertDialogBuilder(this)
+                        .setTitle(R.string.update_available_title)
+                        .setMessage(getString(R.string.update_available_message, r.latestVersion, r.currentVersion))
+                        .setNegativeButton(R.string.update_later, null)
+                        .setPositiveButton(R.string.update_download) { _, _ ->
+                            openExternally(android.net.Uri.parse(r.downloadUrl))
+                        }
+                        .show()
+                else ->
+                    android.widget.Toast.makeText(this, getString(R.string.update_up_to_date, r.currentVersion), android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun showTabsPanel() {

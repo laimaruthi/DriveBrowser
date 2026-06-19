@@ -89,7 +89,20 @@
     <string name="update_later">Later</string>
 
     <string name="start_page_title">DriveBrowser</string>
+    <string name="start_page_subtitle">Quick access for the sites you use most.</string>
     <string name="error_page_title">Can\'t reach this site</string>
+
+    <string name="empty_slot">Empty Slot</string>
+    <string name="empty_slot_hint">Tap to add a site.</string>
+    <string name="resume_last_page">Resume Last Page</string>
+    <string name="photo">Photo</string>
+
+    <!-- Menu sheet -->
+    <string name="menu_start_page_subtitle">Start Page</string>
+    <string name="menu_external">External</string>
+    <string name="menu_check_updates">Check for Updates</string>
+    <string name="menu_open_github">Open GitHub</string>
+    <string name="menu_footer">DriveBrowser v%1$s</string>
 
     <!-- Quick links -->
     <string name="add_quick_link">Add</string>

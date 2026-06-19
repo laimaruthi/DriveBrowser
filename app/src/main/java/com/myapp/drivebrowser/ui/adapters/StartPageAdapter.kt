@@ -1,5 +1,6 @@
 package com.myapp.drivebrowser.ui.adapters
 
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,21 +37,33 @@ class StartPageAdapter(
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         val slot = items[position]
+        val ctx = holder.itemView.context
         if (slot.url.isBlank()) {
             holder.icon.setImageResource(R.drawable.ic_add)
-            holder.label.text = holder.itemView.context.getString(R.string.add_quick_link)
+            holder.hint.text = ""
+            holder.label.text = ctx.getString(R.string.empty_slot)
+            holder.url.text = ctx.getString(R.string.empty_slot_hint)
             holder.itemView.setOnClickListener { onEdit(position) }
         } else {
             val icon = SiteIconCache.load(slot.url)
             if (icon != null) holder.icon.setImageBitmap(icon) else holder.icon.setImageResource(R.drawable.ic_public)
-            holder.label.text = slot.label.ifBlank { slot.url }
+            holder.hint.text = hostHint(slot.url)
+            holder.label.text = slot.label.ifBlank { hostHint(slot.url) }
+            holder.url.text = slot.url
             holder.itemView.setOnClickListener { onOpen(slot.url) }
         }
         holder.itemView.setOnLongClickListener { onEdit(position); true }
     }
 
+    private fun hostHint(url: String): String {
+        val host = Uri.parse(url).host ?: url
+        return if (host.length > 6) host.take(6) + "…" else host
+    }
+
     class VH(v: View) : RecyclerView.ViewHolder(v) {
         val icon: ImageView = v.findViewById(R.id.slotIcon)
+        val hint: TextView = v.findViewById(R.id.slotHint)
         val label: TextView = v.findViewById(R.id.slotLabel)
+        val url: TextView = v.findViewById(R.id.slotUrl)
     }
 }
