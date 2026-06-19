@@ -84,6 +84,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        com.myapp.drivebrowser.adblock.AdBlocker.init(this)
+
         tabManager = TabManager(this, binding.webViewContainer, buildTabCallbacks())
 
         setupAdapters()

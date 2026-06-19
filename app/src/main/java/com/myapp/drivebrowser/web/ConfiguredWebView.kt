@@ -22,8 +22,10 @@ import androidx.core.net.toUri
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import com.myapp.drivebrowser.R
+import com.myapp.drivebrowser.adblock.AdBlocker
 import com.myapp.drivebrowser.data.BrowserPreferences
 import com.myapp.drivebrowser.model.UserAgentProfile
+import java.io.ByteArrayInputStream
 
 /** Callbacks the host activity supplies so the WebView can drive the UI. */
 data class BrowserCallbacks(
@@ -92,6 +94,14 @@ fun configureWebView(
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                 if (handleCleartextIfNeeded(view, request.url, callbacks, onPageStart = false)) return true
                 return shouldHandExternally(request.url)
+            }
+
+            override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
+                // Never block the top-level document — only ad/tracker sub-resources.
+                if (!request.isForMainFrame && AdBlocker.shouldBlock(request.url?.toString())) {
+                    return blockedResponse()
+                }
+                return super.shouldInterceptRequest(view, request)
             }
 
             override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
@@ -183,6 +193,10 @@ fun configureWebView(
         })
     }
 }
+
+/** An empty 200 response used to swallow a blocked ad/tracker request. */
+private fun blockedResponse(): WebResourceResponse =
+    WebResourceResponse("text/plain", "utf-8", ByteArrayInputStream(ByteArray(0)))
 
 private fun loadErrorPage(view: WebView, failedUrl: String?, code: Int, message: String?) {
     val asset = "file:///android_asset/error.html?failedUrl=${Uri.encode(failedUrl.orEmpty())}" +

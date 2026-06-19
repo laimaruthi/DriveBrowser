@@ -35,6 +35,8 @@ A single `MainActivity` coordinates focused, modular components:
 - ✅ Microphone (getUserMedia) and geolocation permission flows with per-site consent
 - ✅ **Voice / Web Speech API** (`webkitSpeechRecognition`) bridge to native `SpeechRecognizer`,
   origin-validated and gated by the per-site microphone consent flow
+- ✅ **Ad & tracker blocking** — host-based blocklist applied to all sub-resource requests
+  (`shouldInterceptRequest`), with a Settings toggle; bundled starter list, subdomain-aware
 - ✅ Settings: home page, theme, restore tabs, desktop default, persistent URL bar, clear data
 
 ### Security posture (hardened vs. typical WebView defaults)

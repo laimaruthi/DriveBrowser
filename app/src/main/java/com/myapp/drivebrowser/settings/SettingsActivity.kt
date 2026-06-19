@@ -38,6 +38,7 @@ class SettingsActivity : AppCompatActivity() {
         switchDesktop.isChecked = BrowserPreferences.isDesktopDefault(this@SettingsActivity)
         switchPersistentUrl.isChecked = BrowserPreferences.isPersistentUrlBar(this@SettingsActivity)
         switchDarkPages.isChecked = BrowserPreferences.isDarkPagesEnabled(this@SettingsActivity)
+        switchAdBlock.isChecked = BrowserPreferences.isAdBlockEnabled(this@SettingsActivity)
         when (BrowserPreferences.getThemeMode(this@SettingsActivity)) {
             AppThemeMode.SYSTEM -> themeSystem.isChecked = true
             AppThemeMode.LIGHT -> themeLight.isChecked = true
@@ -52,6 +53,8 @@ class SettingsActivity : AppCompatActivity() {
         BrowserPreferences.setDesktopDefault(ctx, switchDesktop.isChecked)
         BrowserPreferences.setPersistentUrlBar(ctx, switchPersistentUrl.isChecked)
         BrowserPreferences.setDarkPagesEnabled(ctx, switchDarkPages.isChecked)
+        BrowserPreferences.setAdBlockEnabled(ctx, switchAdBlock.isChecked)
+        com.myapp.drivebrowser.adblock.AdBlocker.setEnabled(switchAdBlock.isChecked)
         val mode = when {
             themeLight.isChecked -> AppThemeMode.LIGHT
             themeDark.isChecked -> AppThemeMode.DARK

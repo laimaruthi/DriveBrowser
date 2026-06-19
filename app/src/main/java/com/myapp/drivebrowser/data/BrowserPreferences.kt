@@ -21,6 +21,7 @@ object BrowserPreferences {
     private const val KEY_PERSISTENT_URL = "persistent_url"
     private const val KEY_RESTORE_TABS = "restore_tabs"
     private const val KEY_DESKTOP_DEFAULT = "desktop_default"
+    private const val KEY_AD_BLOCK = "ad_block_enabled"
     private const val KEY_BOOKMARKS = "bookmarks"
     private const val KEY_TAB_SESSION = "tab_session"
     private const val KEY_ALLOWED_CLEAR_HOSTS = "allowed_cleartext_hosts"
@@ -71,6 +72,10 @@ object BrowserPreferences {
     fun isDesktopDefault(context: Context) = prefs(context).getBoolean(KEY_DESKTOP_DEFAULT, false)
     fun setDesktopDefault(context: Context, v: Boolean) =
         prefs(context).edit().putBoolean(KEY_DESKTOP_DEFAULT, v).apply()
+
+    fun isAdBlockEnabled(context: Context) = prefs(context).getBoolean(KEY_AD_BLOCK, true)
+    fun setAdBlockEnabled(context: Context, v: Boolean) =
+        prefs(context).edit().putBoolean(KEY_AD_BLOCK, v).apply()
 
     // ---- URL helpers ----
 

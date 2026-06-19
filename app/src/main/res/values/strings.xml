@@ -62,6 +62,7 @@
     <string name="settings_persistent_url">Always show address bar</string>
     <string name="settings_restore_tabs">Restore tabs on launch</string>
     <string name="settings_desktop_default">Open sites in desktop mode</string>
+    <string name="settings_ad_block">Block ads and trackers</string>
     <string name="settings_clear_cleartext">Clear allowed insecure sites</string>
     <string name="settings_clear_data">Clear browsing data</string>
     <string name="settings_save">Save</string>

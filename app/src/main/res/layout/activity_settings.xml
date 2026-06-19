@@ -65,6 +65,11 @@
         <!-- Privacy -->
         <TextView style="@style/SettingsHeader" android:text="@string/settings_privacy" />
 
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchAdBlock"
+            style="@style/SettingsSwitch"
+            android:text="@string/settings_ad_block" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnClearCleartext"
             style="@style/Widget.Material3.Button.TonalButton"
